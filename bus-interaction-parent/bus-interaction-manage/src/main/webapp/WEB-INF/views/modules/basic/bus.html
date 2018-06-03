@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>车辆管理</title>
+    <#include "/baseHeader.html">
+<body>
+
+<div id="bsBus" v-cloak>
+    <!-- 查询车辆类型-->
+    <div class="panel panel-default" v-show="showList">
+        <div class="panel-heading">车辆管理查询</div>
+        <div class="panel-body">
+            <el-row>
+                <el-form :inline="true" class="demo-form-inline">
+                    <el-col :span="8">
+                        <el-form-item label="车辆管理">
+                            <el-input v-model="query.organName" clearable icon="search" placeholder="请输入公司机构"
+                                      :disabled="true" :on-icon-click="showOrganTree"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="车辆类型">
+                            <el-select v-model="query.busType" placeholder="请选择车辆类型">
+                                <el-option
+                                        v-for="busType in busTypes"
+                                        :key="busType.value"
+                                        :label="busType.label"
+                                        :value="busType.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="车辆状态">
+                            <el-select v-model="query.busStatus" placeholder="请选择车辆状态">
+                                <el-option
+                                        v-for="busStatus in busStatuses"
+                                        :key="busStatus.value"
+                                        :label="busStatus.label"
+                                        :value="busStatus.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-form>
+                <el-form :inline="true" class="demo-form-inline">
+                    <el-col :span="8">
+                        <el-form-item label="车辆简称">
+                            <el-input placeholder="请输入车辆简称" v-model="query.busName"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="车牌号码">
+                            <el-input placeholder="请输入车牌号码" v-model="query.numberPlate"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="线路名称">
+                            <el-input placeholder="请输入线路名称" v-model="query.routeName"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">
+                            <el-button type="primary" @click="clearCondition">清空</el-button>
+                            <el-button type="primary" icon="search" @click="searchBsBus">搜索</el-button>
+                        </div>
+                    </el-col>
+                </el-form>
+            </el-row>
+        </div>
+    </div>
+    <!-- 车辆列表-->
+    <div v-show="showList">
+        <el-table
+                ref="multipleTable"
+                :data="bsBuses"
+                tooltip-effect="dark"
+                border
+                @selection-change="handleSelectionChange"
+                style="width: 100%">
+            <el-table-column
+                    type="selection"
+                    width="50">
+            </el-table-column>
+            <el-table-column
+                    prop="busType"
+                    label="车辆类型"
+                    :formatter="formatBsBusTpye">
+            </el-table-column>
+            <el-table-column
+                    prop="busCode"
+                    label="车辆编码">
+            </el-table-column>
+            <el-table-column
+                    prop="busName"
+                    label="车辆简称">
+            </el-table-column>
+
+            <el-table-column
+                    prop="numberPlate"
+                    label="车牌号码">
+            </el-table-column>
+            <el-table-column
+                    prop="organName"
+                    label="机构名称">
+            </el-table-column>
+
+            <el-table-column
+                    prop="routeName"
+                    label="路线名称">
+            </el-table-column>
+
+            <el-table-column
+                    prop="busStatus"
+                    label="车辆状态"
+                    :formatter="formatBsBusStatus">
+            </el-table-column>
+            <!-- <el-table-column
+                     label="操作">
+                 <template scope="scope">
+                         <el-button type="text" @click="updateBusInRow(scope.row)">修改</el-button>
+                         <el-button type="text"  @click="deleteBusInRow(scope.row)" >删除</el-button>
+                 </template>
+             </el-table-column> -->
+
+        </el-table>
+        <br/>
+
+        <el-row>
+
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[20, 30, 40, 50, 100]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </el-row>
+        <br/>
+    </div>
+    <el-dialog title="选择部门" :visible.sync="showOrganName" :show-close=false>
+        <el-tree
+                :data="organNameTree"
+                :expand-on-click-node="false"
+                node-key="organId"
+                ref="organNameTree"
+                @node-click="handleOrganNodeClick"
+                :props="defaultPropsOrgan">
+        </el-tree>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showOrganName = false">取 消</el-button>
+        </div>
+    </el-dialog>
+
+    <div class="panel panel-default" v-show="!showList">
+        <div class="panel-heading">{{title}}</div>
+        <div class="panel-body">
+
+            <el-form :model="busForm" ref="busForm" label-width="140px">
+                <el-form-item label="车辆名称" prop="busName">
+                    <el-input v-model="busForm.busName" placeholder="请输入车辆名称" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="车辆类型" prop="busType">
+                    <el-radio-group v-model="busForm.busType">
+                        <el-radio label="0">小巴</el-radio>
+                        <el-radio label="1">大巴</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="车牌号码" prop="numberPlate">
+                    <el-input v-model="busForm.numberPlate" placeholder="请输入车牌号码" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="车辆线路" prop="routecode">
+                    <el-input v-model="busForm.routecode" placeholder="请输入车辆路线" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="车辆标签" prop="busLabel">
+                    <el-input v-model="busForm.busLabel" placeholder="请输入车辆标签" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="车辆状态" prop="busStatus">
+                    <el-radio-group v-model="busForm.busStatus">
+                        <el-radio label="0">运营中</el-radio>
+                        <el-radio label="1">未运营</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="cancel">取消</el-button>
+                    <el-button type="primary" @click="saveBsBus">保存</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+    </div>
+    <!-- 新增，修改用户结束 -->
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basic/bus.js?_${.now?long}"></script>
+</body>
+</html>

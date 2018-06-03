@@ -1,0 +1,327 @@
+@charset "utf-8";
+
+blockquote, body, button, dd, div, dl, dt, form, h1, h2, h3, h4, h5, h6, input, li, ol, p, pre, td, textarea, th, ul {
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+div {
+    display: block;
+}
+
+.app-header {
+    background-color: #eef1f6;
+    height: 60px;
+}
+
+.app-header-logo-box {
+    width: 280px;
+    height: 60px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.app-header-logo {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    left: 10px;
+    top: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #324157;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+}
+
+.app-header-menu {
+    float: right;
+    margin-top: -60px;
+}
+
+.app-sidebar-box {
+    transition: width .28s ease-out;
+    width: 180px;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    z-index: 1001;
+    overflow-y: auto;
+    background-color: #324157;
+}
+
+.app-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    margin-top: -10px;
+}
+
+.app-wrapper:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.app-wrapper.hideSidebar .sidebar-container {
+    width: 36px;
+    overflow: inherit;
+}
+
+.app-wrapper.hideSidebar .main-container {
+    margin-left: 36px;
+}
+
+.app-wrapper .sidebar-container {
+    transition: width 0.28s ease-out;
+    width: 180px;
+    height: 100%;
+    position: fixed;
+    z-index: 1001;
+    overflow-y: auto;
+}
+
+.app-wrapper .sidebar-container::-webkit-scrollbar {
+    display: none;
+}
+
+.app-wrapper .main-container {
+    min-height: 100%;
+    transition: margin-left 0.28s ease-out;
+    margin-left: 180px;
+}
+
+.sidebar-container .menu-icon {
+    margin-right: 16px;
+    width: 1em;
+    height: 1em;
+    vertical-align: -.15em;
+}
+
+.sidebar-container > .el-menu {
+    width: 100% !important;
+    min-height: 100%;
+}
+
+.sidebar-container .svg-icon {
+    margin-right: 16px;
+}
+
+.hideSidebar .el-submenu > .el-submenu__title,
+.hideSidebar .submenu-title-noDropdown {
+    padding-left: 10px !important;
+}
+
+.hideSidebar .submenu-title-noDropdown span,
+.hideSidebar .el-submenu > .el-submenu__title > span {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    visibility: hidden;
+    display: inline-block;
+}
+
+.hideSidebar .nest-menu .el-submenu__title {
+    text-align: initial !important;
+    padding-left: 20px !important;
+}
+
+.hideSidebar .nest-menu .el-submenu__title span {
+    height: auto;
+    width: auto;
+    visibility: visible;
+    display: inline;
+}
+
+.hideSidebar .nest-menu .el-submenu__title .el-submenu__icon-arrow {
+    display: block !important;
+}
+
+.hideSidebar .menu-wrapper > .el-menu-item,
+.hideSidebar .submenu-title-noDropdown,
+.hideSidebar .menu-wrapper > .el-submenu .el-submenu__title {
+    text-align: center;
+}
+
+.hideSidebar .el-menu-item .el-submenu__icon-arrow,
+.hideSidebar .el-submenu .el-submenu__title .el-submenu__icon-arrow {
+    display: none;
+}
+
+.hideSidebar .submenu-title-noDropdown {
+    position: relative;
+}
+
+.hideSidebar .submenu-title-noDropdown span {
+    transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
+    opacity: 0;
+}
+
+.hideSidebar .submenu-title-noDropdown:hover span {
+    display: block;
+    border-radius: 3px;
+    z-index: 1002;
+    width: 140px;
+    height: 56px;
+    visibility: visible;
+    position: absolute;
+    right: -145px;
+    text-align: left;
+    text-indent: 20px;
+    top: 0px;
+    background-color: #1f2d3d;
+    opacity: 1;
+}
+
+.el-submenu .el-menu {
+    min-width: 180px !important;
+}
+
+/* 右侧主体区域 */
+.layui-body {
+    bottom: 0;
+    border-left: solid 2px #1AA094;
+}
+
+.layui-tab-content {
+    min-height: 150px;
+    /* padding: 5px 0 0 0; */
+}
+
+/* tab选项卡 */
+.layui-body {
+    padding-left: 0px;
+}
+
+.layui-layout-admin .layui-body {
+    top: 58px;
+}
+
+.larry-tab-menu {
+    width: 200px;
+    height: 40px;
+    display: none;
+}
+
+.larry-tab-box .layui-tab-title li em {
+    padding-left: 5px;
+    font-style: normal;
+}
+
+#admin-home i.layui-icon {
+    display: none;
+}
+
+.larry-tab-box {
+    box-shadow: none;
+}
+
+/* layui-tab-title start */
+.layui-tab-title .larry-tab-menu {
+    display: inline-block;
+    float: right;
+    border: 1px solid red;
+    position: relative;
+    font-size: 14px;
+}
+
+.larry-test {
+
+    height: 40px;
+    color: #000;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.refresh_iframe {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 1px;
+    height: 41px;
+    background: #33AB9F;
+    color: #FFFFFF;
+}
+
+/* layui-tab-title end */
+.layui-tab-content {
+    padding: 0px;
+    margin: 0px;
+}
+
+.layui-tab-item {
+    padding: 10px 0 0 10px;
+    margin: 0px;
+
+}
+
+.layui-tab-content .layui-tab-item iframe {
+    width: 100%;
+    border: 0;
+    height: 100%;
+}
+
+.larry-tab-box > .layui-tab-title {
+    border-bottom: 1px solid #1AA094;
+}
+
+.larry-tab-box .layui-tab-title cite {
+    font-style: normal;
+    padding-left: 5px;
+}
+
+.larry-tab-box > .layui-tab-title .layui-this {
+    color: white;
+    background-color: #20a0ff;
+}
+
+.larry-tab-box > .layui-tab-title .layui-this:after {
+    border-bottom: 0;
+}
+
+.layui-tab-card {
+    border: 1px solid #e2e2e2;
+    border-left: 0px;
+}
+
+body .layui-layout-admin .layui-larry-foot {
+    height: 30px;
+    padding-left: 180px;
+    line-height: 30px;
+    background-color: #eee;
+    color: #666;
+    font-weight: 300;
+    border-left: 2px solid #1AA094;
+    z-index: 998;
+}
+
+body .layui-layout-admin .layui-larry-foot a {
+    padding: 0 5px;
+
+}
+
+#larry-footer .layui-larry-foot {
+    height: 30px;
+    padding-left: 180px;
+    line-height: 30px;
+    background-color: #eee;
+    color: #666;
+    font-weight: 300;
+    border-left: 2px solid #1AA094;
+    z-index: 998;
+}
+
+.collapseFoot {
+    padding-left: 45px;
+}
+
+.expandFoot {
+    padding-left: 190px;
+}
+
+[v-cloak] {
+    display: none !important;
+}

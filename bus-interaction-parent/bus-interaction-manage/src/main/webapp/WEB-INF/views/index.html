@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="${request.contextPath}/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/statics/plugins/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/statics/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="${request.contextPath}/statics/plugins/element-ui/theme-default/index.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/statics/css/index.css">
+</head>
+<body>
+<div class="app-layout app-layout-admin" id="app_layout" v-cloak>
+    <!-- 顶部区域 -->
+    <div class="app-header">
+        <div class="app-header-logo-box">
+            <span class="app-header-logo">后台管理系统</span>
+            <span style="padding-left: 10px" @click="handleBarClick"><img :src="barImage" width="20px" height="20px"
+                                                                          style="margin-top: -8px"></span>
+        </div>
+        <div class="app-header-menu">
+            <el-menu class="el-menu-demo" :default-active="index" mode="horizontal" @select="handleSelect4Nav">
+                <el-menu-item index="1"><i class="fa fa-lock" @click="updatePassword"></i> &nbsp;修改密码</el-menu-item>
+                <el-menu-item index="2"><i class="fa fa-sign-out"></i> &nbsp;退出系统</el-menu-item>
+            </el-menu>
+        </div>
+    </div>
+    <!-- 主内容开始 -->
+    <div class="app-wrapper" :class="{hideSidebar:isCollapse}">
+        <el-menu theme="red" class="sidebar-container" mode="vertical" :collapse="isCollapse"
+                 @select="handleSelect4Menu">
+            <sidebar-item :routes='menuList'></sidebar-item>
+        </el-menu>
+        <div class="main-container">
+            <div class="layui-tab layui-tab-card larry-tab-box" id="larry-tab" lay-filter="main-tab"
+                 lay-allowclose="true">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" id="admin-home"><i class="fa fa-home"></i><em>控制台</em></li>
+                </ul>
+                <div class="layui-tab-content" style="min-height: 150px; ">
+                    <div class="layui-tab-item layui-show">
+                        <iframe class="larry-iframe" data-id='0' src="main.html"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 底部区域 -->
+        <div class="layui-footer layui-larry-foot" id="larry-footer">
+            <div class="layui-mian" :class="{collapseFoot:isCollapse,expandFoot:!isCollapse}">
+                Copyright &copy; 2017 <a href="http://www.gci-china.com/Web/Main.aspx" target="_blank">gci-china.com</a>
+                All Rights Reserved
+            </div>
+        </div>
+    </div>
+    <!-- 主内容结束 -->
+
+    <!-- 修改密码 -->
+    <div id="passwordLayer" style="display: none;">
+
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">账号</label>
+                <label class="layui-form-label laber-account">{{user.username}}</label>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">原密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" v-model="password" placeholder="原密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">新密码</label>
+                <div class="layui-input-inline">
+                    <input v-model="newPassword" placeholder="新密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="${request.contextPath}/statics/libs/jquery.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/statics/plugins/layui/layui.js"></script>
+<script type="text/javascript" src="${request.contextPath}/statics/libs/vue.min.js"></script>
+<!-- 引入组件库 -->
+<script type="text/javascript" src="${request.contextPath}/statics/plugins/element-ui/index.js"></script>
+<script>
+    var navtab;
+    layui.config({
+        base: 'statics/js/'
+    }).use(['navtab'], function () {
+        window.jQuery = window.$ = layui.jquery;
+        window.layer = layui.layer;
+        navtab = layui.navtab({
+            elem: '.larry-tab-box'
+        });
+
+        //iframe自适应
+        $(window).on('resize', function () {
+            var $content = $('#larry-tab .layui-tab-content');
+            $content.height($(this).height() - 140);
+            $content.find('iframe').each(function () {
+                $(this).height($content.height());
+            });
+        }).resize();
+    });
+
+
+    layui.use(['jquery', 'layer', 'element'], function () {
+        window.jQuery = window.$ = layui.jquery;
+        window.layer = layui.layer;
+    });
+
+    var sidebarItem = Vue.extend({
+        name: 'sidebar-item',
+        props: {
+            routes: {
+                type: Array
+            }
+        },
+        template: [
+            '<div class="menu-wrapper">',
+            '<template v-for="item in routes">',
+            '<el-menu-item v-if="item.type === 1" :index="item.url">',
+            '<i class="menu-icon" :class="item.icon"></i><input type="hidden" :id="item.url" :value="item|formatMenu"/><span>{{item.name}}</span>',
+            '</el-menu-item>',
+            '<el-submenu :index="item.menuId" v-if="item.type === 0">',
+            '<template slot="title">',
+            '<i class="menu-icon" :class="item.icon"></i><span>{{item.name}}</span>',
+            '</template>',
+            '<template v-for="child in item.list">',
+            '<sidebar-item v-if="child.type === 0" class="nest-menu" :routes="[child]"></sidebar-item>',
+            '<el-menu-item v-else :index="child.url">',
+            '<i class="menu-icon" :class="child.icon"></i><input type="hidden" :id="child.url" :value="child|formatMenu"/><span>{{child.name}}</span>',
+            '</el-menu-item>',
+            '</template>',
+            '</el-submenu>',
+            '</template>',
+            '</div>'
+        ].join('')
+    });
+    Vue.component('sidebarItem', sidebarItem);
+
+    Vue.filter("formatMenu", function (value) {   //全局方法 Vue.filter() 注册一个自定义过滤器,必须放在Vue实例化前面
+        return value.name + ',' + value.icon;
+    });
+
+    var vm = new Vue({
+        el: '#app_layout',
+        data: {
+            user: {},
+            menuList: {},
+            password: '',
+            newPassword: '',
+            barImage: 'statics/images/bars-h.png',
+            isCollapse: false,
+            index: '',
+            navTitle: "控制台"
+        },
+        methods: {
+            getMenuList: function () {
+                $.getJSON("sys/menu/nav?_" + $.now(), function (r) {
+                    vm.menuList = r.menuList;
+                });
+            },
+            getUser: function () {
+                $.getJSON("sys/user/info?_" + $.now(), function (r) {
+                    vm.user = r.user;
+                });
+            },
+            updatePassword: function () {
+                layer.open({
+                    type: 1,
+                    skin: 'layui-layer-molv',
+                    title: "修改密码",
+                    area: ['550px', '270px'],
+                    shadeClose: false,
+                    content: jQuery("#passwordLayer"),
+                    btn: ['修改', '取消'],
+                    btn1: function (index) {
+                        var data = "password=" + vm.password + "&newPassword=" + vm.newPassword;
+                        $.ajax({
+                            type: "POST",
+                            url: "sys/user/password",
+                            data: data,
+                            dataType: "json",
+                            success: function (result) {
+                                if (result.code == 0) {
+                                    layer.close(index);
+                                    layer.alert('修改成功', function (index) {
+                                        location.reload();
+                                    });
+                                } else {
+                                    layer.alert(result.msg);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            handleBarClick: function () {
+                if (vm.barImage.indexOf('bars-h.png') != -1) {
+                    vm.barImage = 'statics/images/bars-v.png';
+                    vm.isCollapse = true;
+                } else {
+                    vm.barImage = 'statics/images/bars-h.png';
+                    vm.isCollapse = false;
+                }
+            },
+            handleSelect4Nav: function (index) {
+                if ("1" === index) {
+                    vm.updatePassword();
+                } else if ("2" === index) {
+                    window.location.href = 'logout';
+                }
+            },
+            handleSelect4Menu: function (index) {
+                var tabTitleAndIcon = $("input[id='" + index + "']").val();
+                var tab = tabTitleAndIcon.split(',');
+                var data = {
+                    href: index,
+                    icon: tab[1],
+                    title: tab[0]
+                }
+                navtab.tabAdd(data);
+            }
+        },
+        created: function () {
+            this.getMenuList();
+            this.getUser();
+        }
+    });
+</script>
+</body>
+</html>

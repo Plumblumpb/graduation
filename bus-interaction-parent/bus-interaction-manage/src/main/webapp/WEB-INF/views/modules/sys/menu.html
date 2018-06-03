@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <title>菜单管理</title>
+    <#include "/header.html">
+        <#include "/baseHeader.html">
+            <link rel="stylesheet" href="${request.contextPath}/statics/css/bootstrap-table.min.css">
+            <link rel="stylesheet" href="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.css">
+            <script src="${request.contextPath}/statics/libs/bootstrap-table.min.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.min.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.bootstrap3.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.extension.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/tree.table.js"></script>
+
+            <link rel="stylesheet" type="text/css"
+                  href="${request.contextPath}/statics/css/jquery.fonticonpicker.min.css"/>
+            <link rel="stylesheet" type="text/css" href="${request.contextPath}/statics/css/font-awesome.min.css">
+            <link rel="stylesheet" type="text/css"
+                  href="${request.contextPath}/statics/css/jquery.fonticonpicker.grey.min.css"/>
+            <script type="text/javascript"
+                    src="${request.contextPath}/statics/js/jquery.fonticonpicker.min.js"></script>
+            <script type="text/javascript" src="${request.contextPath}/statics/js/soure.js"></script>
+            </head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+
+            <el-button type="primary" @click="add">新增</el-button>
+
+            <el-button type="primary" @click="del">删除</el-button>
+        </div>
+        <div class='panel panel-default' v-show="showList">
+            <div class="common-element-table" v-show="showList">
+                <el-table :data="menuNameTree" border @selection-change="handleSelectionChange">
+                    <el-table-column
+                            type="selection"
+                            fixed
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            fixed
+                            prop="menuId"
+                            label="菜单ID"
+                            width="100">
+                    </el-table-column>
+                    <el-table-tree-column
+                            file-icon="icon icon-file"
+                            folder-icon="icon icon-folder"
+                            prop="name"
+                            label="菜单名称"
+                            header-align="center"
+                            width="180">
+                    </el-table-tree-column>
+                    <el-table-column
+                            prop="parentName"
+                            label="上级菜单"
+                            width="180">
+                    </el-table-column>
+                    <el-table-column
+                            prop="icon"
+                            label="图标"
+                            width="80">
+                        <template scope="scope">
+                            <span v-html="scope.row.icon"></span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="type"
+                            label="类型"
+                            width="80">
+                        <template scope="scope">
+                            <span v-if="scope.row.type== '0'" class="label label-primary">目录</span>
+                            <span v-else-if="scope.row.type== '1'" class="label label-success">菜单</span>
+                            <span v-else-if="scope.row.type== '2'" class="label label-warning">按钮</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="orderNum"
+                            label="排序号">
+                    </el-table-column>
+                    <el-table-column
+                            prop="url"
+                            label="菜单URL">
+                    </el-table-column>
+                    <el-table-column
+                            prop="perms"
+                            label="授权标识"
+                            :show-overflow-tooltip="true">
+                    </el-table-column>
+                    <el-table-column
+                            label="操作"
+                            width="120">
+                        <template scope="scope">
+                            <#if shiro.hasPermission("sys:menu:update")>
+                                <el-button type="primary" @click="update(scope.row)">修改</el-button>
+                            </#if>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <div class="panel-body">
+            <el-row :gutter="10">
+                <el-col :span="8">
+                    <!-- 配置基础信息 -->
+                    <el-form :model="menu" ref="menu" label-width="140px">
+                        <el-form-item label="类型" prop="type">
+                            <el-radio-group v-model="menu.type">
+                                <el-radio label="0">目录</el-radio>
+                                <el-radio label="1">菜单</el-radio>
+                                <el-radio label="2">按钮</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+
+                        <el-form-item label="菜单名称" prop="name">
+                            <el-input v-model="menu.name" placeholder="菜单名称或按钮名称" class="middleInput"></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="上级菜单">
+                            <el-input class="middleInput" v-model="menu.parentName" clearable icon="search"
+                                      placeholder="一级菜单" :disabled="true" :on-icon-click="showMenuTree"></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="菜单URL" prop="url" v-if="menu.type == 1">
+                            <el-input v-model="menu.url" placeholder="菜单URL" class="middleInput"></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="授权标识" prop="perms" v-if="menu.type == 1 || menu.type == 2">
+                            <el-input v-model="menu.perms" placeholder="多个用逗号分隔，如：user:list,user:create"
+                                      class="middleInput"></el-input>
+                        </el-form-item>
+                        <el-form-item label="排序号" prop="orderNum" v-if="menu.type != 2">
+                            <el-input-number v-model="menu.orderNum" ontrols-position="right" placeholder="排序号"
+                                             class="middleInput"></el-input-number>
+                        </el-form-item>
+
+                        <el-form-item label="图标" prop="icon" v-if="menu.type != 2">
+                            <el-input v-model="menu.icon" type="text" name="menuIcon" id="menuIcon"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="reload">返回</el-button>
+                            <el-button type="primary" @click="saveOrUpdate">确定</el-button>
+                        </el-form-item>
+
+                    </el-form>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+
+    <!-- 选择菜单 -->
+
+    <el-dialog title="选择部门" :visible.sync="showMenuName" :show-close=false>
+        <el-tree
+                :data="menuTree"
+                :expand-on-click-node="false"
+                node-key="menuId"
+                ref="menuTree"
+                :default-expanded-keys="[1]"
+                @node-click="handleMenuNodeClick"
+                :props="defaultPropsMenu">
+        </el-tree>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showMenuName = false">取 消</el-button>
+        </div>
+    </el-dialog>
+
+    <script src="${request.contextPath}/statics/js/modules/sys/menu.js?_${.now?long}"></script>
+</body>
+</html>

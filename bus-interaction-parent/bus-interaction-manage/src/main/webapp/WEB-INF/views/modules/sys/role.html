@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>角色管理</title>
+    <#include "/baseHeader.html">
+        </head>
+<body>
+<div id="sysRole" v-cloak>
+    <!-- 查询框开始 -->
+    <div class="panel panel-default" v-show="showList">
+        <div class="panel-heading">系统角色查询</div>
+        <div class="panel-body">
+            <el-row>
+                <el-form :inline="true" :model="query" class="demo-form-inline">
+                    <el-col :span="8">
+                        <el-form-item label="角色名称">
+                            <el-input v-model="query.roleName" @keyup.enter="searchSysRoles"
+                                      placeholder="角色名称"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-form>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <div class="grid-content bg-purple">
+                        <el-button type="primary" @click="clearCondition">清空</el-button>
+                        <el-button type="primary" icon="search" @click="searchSysRoles">搜索</el-button>
+                        <#if shiro.hasPermission("sys:role:save")>
+                            <el-button type="primary" @click="addRole">新增</el-button>
+                        </#if>
+                        <#if shiro.hasPermission("sys:role:delete")>
+                            <el-button type="primary" @click="deleteRole">删除</el-button>
+                        </#if>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+    <div v-show="showList">
+        <el-table
+                ref="multipleTable"
+                :data="sysRoles"
+                border
+                tooltip-effect="dark"
+                @selection-change="handleSelectionChange"
+                style="width: 100%">
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+            <el-table-column
+                    prop="roleName"
+                    label="角色名称">
+            </el-table-column>
+            <el-table-column
+                    prop="deptName"
+                    label="所属部门">
+            </el-table-column>
+            <el-table-column
+                    prop="remark"
+                    label="备注"
+                    show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+                    prop="createTime"
+                    label="创建时间"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    label="操作">
+                <template scope="scope">
+                    <#if shiro.hasPermission("sys:role:update")>
+                        <el-button type="text" @click="updateRole(scope.row)">修改</el-button>
+                    </#if>
+                    <#if shiro.hasPermission("sys:role:delete")>
+                        <el-button type="text" @click="deleteRoleInRow(scope.row)">删除</el-button>
+                    </#if>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[20, 30, 40, 50, 100]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+        </el-pagination>
+    </div>
+    <!-- 新增，修改角色开始 -->
+    <div class="panel panel-default" v-show="!showList">
+        <div class="panel-heading">{{title}}</div>
+        <div class="panel-body">
+            <el-row :gutter="10">
+                <el-col :span="8">
+                    <!-- 角色基础信息 -->
+                    <el-form :model="roleForm" :rules="rules" ref="roleForm" label-width="140px">
+                        <el-form-item label="角色名称" prop="roleName">
+                            <el-input v-model="roleForm.roleName" placeholder="请输入角色名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="所属部门" prop="deptName" required>
+                            <el-input v-model="roleForm.deptName" icon="search" placeholder="请输入所属部门" :disabled="true"
+                                      :on-icon-click="showDeptTree">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="备注" prop="remark">
+                            <el-input type="textarea" v-model="roleForm.remark" placeholder="备注"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="cancel">取消</el-button>
+                            <el-button type="primary" @click="saveRole">保存</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+                <el-col :span="8">
+                    <!-- 功能权限 -->
+                    <el-tree
+                            :data="menuTree"
+                            show-checkbox
+                            default-expand-all
+                            ref="menuTree"
+                            node-key="menuId"
+                            :props="defaultProps">
+                    </el-tree>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+    <!-- 新增，修改角色结束 -->
+    <!-- 部门树开始 -->
+    <el-dialog title="选择部门" :visible.sync="showDept" :show-close=false>
+        <el-tree
+                :data="deptTree"
+                default-expand-all
+                :expand-on-click-node="false"
+                node-key="deptId"
+                ref="deptTree"
+                @node-click="handleDeptNodeClick"
+                :props="defaultProps4Dept">
+        </el-tree>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showDept = false">取 消</el-button>
+        </div>
+    </el-dialog>
+    <!-- 部门树结束 -->
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/role.js?_${.now?long}"></script>
+</body>
+</html>

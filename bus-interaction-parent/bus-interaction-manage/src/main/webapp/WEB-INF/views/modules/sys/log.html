@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统日志</title>
+    <#include "/baseHeader.html">
+        </head>
+<body>
+<div id="sysLog" v-cloak>
+    <!-- 查询框开始 -->
+    <div class="panel panel-default">
+        <div class="panel-heading">系统日志查询</div>
+        <div class="panel-body">
+            <el-row>
+                <el-form :inline="true" :model="query" class="demo-form-inline">
+                    <el-col :span="8">
+                        <el-form-item label="用户名/用户操作">
+                            <el-input v-model="query.key" @keyup.enter="searchSysLogs"
+                                      placeholder="用户名/用户操作"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-form>
+            </el-row>
+            <el-row>
+                <el-col>
+                    <div class="grid-content bg-purple">
+                        <el-button type="primary" icon="search" @click="clearCondition">清空</el-button>
+                        <el-button type="primary" icon="search" @click="searchSysLogs">搜索</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+    <el-table
+            ref="multipleTable"
+            :data="sysLogs"
+            border
+            tooltip-effect="dark"
+            style="width: 100%">
+        <el-table-column
+                prop="username"
+                label="用户名"
+                width="120">
+        </el-table-column>
+        <el-table-column
+                prop="operation"
+                label="用户操作">
+        </el-table-column>
+        <el-table-column
+                prop="method"
+                label="请求方法"
+                show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+                prop="params"
+                label="请求参数"
+                show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="执行时长(毫秒)"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="ip"
+                label="IP地址"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="createDate"
+                label="创建时间"
+                width="180">
+        </el-table-column>
+    </el-table>
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[20, 30, 40, 50, 100]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/sys/log.js?_${.now?long}"></script>
+</body>
+</html>

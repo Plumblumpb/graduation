@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>用车计划</title>
+    <#include "/baseHeader.html">
+<body>
+<div id="statistic" v-cloak>
+    <div class="panel panel-default" v-show="showList">
+
+        <chart :options="option" style="width: 1000px;height:400px;"></chart>
+        <chart :options="optiontwo" style="width: 1000px;height:400px;"></chart>
+        <chart :options="optionthree" style="width: 1000px;height:400px;"></chart>
+
+    </div>
+</div>
+<script src="${request.contextPath}/statics/plugins/vue-echarts/vue-echarts.js"></script>
+<script src="https://cdn.bootcss.com/echarts/4.0.3/echarts-en.common.js"></script>
+<script src="${request.contextPath}/statics/plugins/vue-echarts/vue-echarts.js"></script>
+
+<script src="${request.contextPath}/statics/js/modules/basic/statistic.js?_${.now?long}"></script>
+</body>
+</html>

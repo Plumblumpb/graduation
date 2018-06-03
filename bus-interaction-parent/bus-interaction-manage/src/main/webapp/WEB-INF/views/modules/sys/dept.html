@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>部门管理</title>
+    <#include "/header.html">
+        <#include "/baseHeader.html">
+            <link rel="stylesheet" href="${request.contextPath}/statics/css/bootstrap-table.min.css">
+            <link rel="stylesheet" href="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.css">
+            <script src="${request.contextPath}/statics/libs/bootstrap-table.min.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.min.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.bootstrap3.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/jquery.treegrid.extension.js"></script>
+            <script src="${request.contextPath}/statics/plugins/treegrid/tree.table.js"></script>
+            </head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn">
+            <#if shiro.hasPermission("sys:dept:save")>
+                <el-button type="primary" @click="add">新增</el-button>
+            </#if>
+            <#if shiro.hasPermission("sys:dept:delete")>
+                <el-button type="primary" @click="del">删除</el-button>
+            </#if>
+        </div>
+        <div class='panel panel-default' v-show="showList">
+            <div class="common-element-table" v-show="showList">
+                <el-table :data="deptNameTree" border @selection-change="handleSelectionChange">
+                    <el-table-column
+                            type="selection"
+                            fixed
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            fixed
+                            prop="deptId"
+                            label="部门ID"
+                            width="100">
+                    </el-table-column>
+                    <el-table-tree-column
+                            file-icon="icon icon-file"
+                            folder-icon="icon icon-folder"
+                            prop="name"
+                            label="部门名称"
+                            header-align="center">
+                    </el-table-tree-column>
+                    <el-table-column
+                            prop="parentName"
+                            label="上级部门">
+                    </el-table-column>
+                    <el-table-column
+                            prop="orderNum"
+                            label="排序号">
+                    </el-table-column>
+                    <el-table-column
+                            label="操作"
+                            width="120">
+                        <template scope="scope">
+                            <#if shiro.hasPermission("sys:dept:update")>
+                                <el-button type="primary" @click="update(scope.row)">修改</el-button>
+                            </#if>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <div class="panel-body">
+            <el-row :gutter="10">
+                <el-col :span="8">
+                    <el-form :model="dept" ref="dept" label-width="140px">
+                        <!-- 配置基础信息 -->
+                        <el-form-item label="部门名称" prop="name">
+                            <el-input v-model="dept.name" placeholder="部门名称" class="middleInput"></el-input>
+                        </el-form-item>
+                        <el-form-item label="上级部门">
+                            <el-input v-model="dept.parentName" clearable icon="search" placeholder="一级部门"
+                                      :disabled="true" :on-icon-click="showDeptTree" class="middleInput"></el-input>
+                        </el-form-item>
+                        <el-form-item label="排序号">
+                            <el-input-number v-model="dept.orderNum" controls-position="right" placeholder="排序号"
+                                             class="middleInput"></el-input-number>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="reload">取消</el-button>
+                            <el-button type="primary" @click="saveOrUpdate">保存</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+
+    <!-- 选择部门 -->
+    <el-dialog title="选择部门" :visible.sync="showDeptName" :show-close=false>
+        <el-tree
+                :data="deptTree"
+                :expand-on-click-node="false"
+                node-key="deptId"
+                ref="deptTree"
+                :default-expanded-keys="[1]"
+                @node-click="handleDeptNodeClick"
+                :props="defaultPropsDept">
+        </el-tree>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showDeptName = false">取 消</el-button>
+        </div>
+    </el-dialog>
+    <script src="${request.contextPath}/statics/js/modules/sys/dept.js?_${.now?long}"></script>
+</body>
+</html>

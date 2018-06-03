@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.module.note.dao.CarplanDao">
+
+    <select id="getAll" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select noteid , username_plan ,car.type , car_number,origin_id,destination_id ,transport_plan,status
+        ,time_plan,time_real,remark from note_car n
+        left JOIN car on car.carid = n.car_id
+        where status in (10,11)
+    </select>
+
+    <insert id="save">
+        insert into note_car
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="noteid != null">
+                noteid,
+            </if>
+            <if test="usernamePlan != null">
+                username_plan,
+            </if>
+            <if test="carId != null">
+                car_id,
+            </if>
+            <if test="carNumber != null">
+                car_number,
+            </if>
+            <if test="originId != null">
+                origin_id,
+            </if>
+            <if test="destinationId != null">
+                destination_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="transportPlan != null">
+                transport_plan,
+            </if>
+            <if test="transportReal != null">
+                transport_real,
+            </if>
+            <if test="begintime != null">
+                beginTime,
+            </if>
+            <if test="timePlan != null">
+                time_plan,
+            </if>
+            <if test="timeReal != null">
+                time_real,
+            </if>
+            <if test="usernameReal != null">
+                username_real,
+            </if>
+            <if test="companyId != null">
+                company_id,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="noteid != null">
+                #{noteid,jdbcType=INTEGER},
+            </if>
+            <if test="usernamePlan != null">
+                #{usernamePlan,jdbcType=VARCHAR},
+            </if>
+            <if test="carId != null">
+                #{carId,jdbcType=VARCHAR},
+            </if>
+            <if test="carNumber != null">
+                #{carNumber,jdbcType=INTEGER},
+            </if>
+            <if test="originId != null">
+                #{originId,jdbcType=VARCHAR},
+            </if>
+            <if test="destinationId != null">
+                #{destinationId,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="transportPlan != null">
+                #{transportPlan,jdbcType=INTEGER},
+            </if>
+            <if test="transportReal != null">
+                #{transportReal,jdbcType=INTEGER},
+            </if>
+            <if test="begintime != null">
+                #{begintime,jdbcType=DATE},
+            </if>
+            <if test="timePlan != null">
+                #{timePlan,jdbcType=DATE},
+            </if>
+            <if test="timeReal != null">
+                #{timeReal,jdbcType=DATE},
+            </if>
+            <if test="usernameReal != null">
+                #{usernameReal,jdbcType=VARCHAR},
+            </if>
+            <if test="companyId != null">
+                #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+
+        </trim>
+    </insert>
+
+
+    <update id="update">
+        update note_car
+        <set>
+            <if test="usernamePlan != null">
+                username_plan = #{usernamePlan,jdbcType=VARCHAR},
+            </if>
+            <if test="carId != null">
+                car_id = #{carId,jdbcType=VARCHAR},
+            </if>
+            <if test="carNumber != null">
+                car_number = #{carNumber,jdbcType=INTEGER},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
+            <if test="destinationId != null">
+                destination_id = #{destinationId,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="transportPlan != null">
+                transport_plan = #{transportPlan,jdbcType=INTEGER},
+            </if>
+            <if test="transportReal != null">
+                transport_real = #{transportReal,jdbcType=INTEGER},
+            </if>
+            <if test="begintime != null">
+                beginTime = #{begintime,jdbcType=DATE},
+            </if>
+            <if test="timePlan != null">
+                time_plan = #{timePlan,jdbcType=DATE},
+            </if>
+            <if test="timeReal != null">
+                time_real = #{timeReal,jdbcType=DATE},
+            </if>
+            <if test="usernameReal != null">
+                username_real = #{usernameReal,jdbcType=VARCHAR},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateStatus">
+
+        update note_car SET status = '20'
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectOne" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select
+        <include refid="Base_Column_List"/>
+        from note_car
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectBySelective" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select noteid , username_plan ,car.type , car_number,origin_id,destination_id ,transport_plan,status
+        ,time_plan,time_real,remark from note_car n
+        left JOIN car on car.carid = n.car_id
+        where
+
+        <if test="usernamePlan != null and usernamePlan != ''">
+            n.username_plan like '%${usernamePlan}%' and
+        </if>
+        <if test="originId != null and originId != ''">
+            n.origin_id = #{originId} and
+        </if>
+        <if test="destinationId != null and destinationId != ''">
+            n.destination_id = #{destinationId} and
+        </if>
+
+        n.status in (10,11)
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from note_car
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </delete>
+
+    <sql id="Base_Column_List">
+        noteid, username_plan, car_id, car_number, origin_id, destination_id, status, transport_plan,
+        transport_real, beginTime, time_plan, time_real, username_real,remark
+    </sql>
+
+</mapper>

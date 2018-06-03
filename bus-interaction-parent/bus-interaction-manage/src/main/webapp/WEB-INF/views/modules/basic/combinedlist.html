@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>用车计划</title>
+    <#include "/baseHeader.html">
+<body>
+<div id="combine" v-cloak>
+    <div class="panel panel-default" v-show="showList">
+        <div class="panel-heading">用车计划查询</div>
+        <div class="panel-body">
+            <el-row>
+                <el-form :inline="true" class="demo-form-inline">
+                    <el-col :span="24">
+
+                        <el-form-item label="员工姓名">
+                            <el-input placeholder="请输入员工姓名" v-model="query.usernamePlan"></el-input>
+                        </el-form-item>
+                        <el-form-item label="出发地">
+                            <el-select v-model="query.originId" placeholder="请选择出发地">
+                                <el-option
+                                        v-for="car in caroptions"
+                                        :key="car.value"
+                                        :label="car.label"
+                                        :value="car.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="目的地">
+                            <el-select v-model="query.destinationId" placeholder="请选择目的地">
+                                <el-option
+                                        v-for="car in caroptions"
+                                        :key="car.value"
+                                        :label="car.label"
+                                        :value="car.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">
+                            <el-button type="primary" @click="clearCondition">清空</el-button>
+                            <el-button type="primary" icon="search" @click="searchcombine">搜索</el-button>
+                            <el-button type="primary" @click="updateAllNote">合并后提交路单</el-button>
+                            <el-button type="primary" @click="updateAll">提交路单</el-button>
+                            <el-button type="primary" @click="deleteAll">删除</el-button>
+
+                        </div>
+                    </el-col>
+                </el-form>
+            </el-row>
+        </div>
+    </div>
+    <!--列表-->
+    <div v-show="showList">
+        <el-table
+                ref="multipleTable"
+                :data="combine"
+                tooltip-effect="dark"
+                border
+                @selection-change="handleSelectionChange"
+                style="width: 100%">
+            <el-table-column
+                    type="selection"
+                    width="50">
+            </el-table-column>
+
+            <el-table-column
+                    prop="noteid"
+                    label="路单编号"
+                    width="100">
+            </el-table-column>
+
+            <el-table-column
+                    prop="usernamePlan"
+                    label="用车计划人员"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="type"
+                    label="车辆类型"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="carNumber"
+                    label="车辆数目"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="transportPlan"
+                    label="拉运量"
+                    width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="originId"
+                    label="出发地"
+                    width="150"
+                    :formatter="formatOriginId">
+            </el-table-column>
+            <el-table-column
+                    prop="destinationId"
+                    label="目的地"
+                    width="150"
+                    :formatter="formatOriginId">
+            </el-table-column>
+
+            <el-table-column
+                    prop="timePlan"
+                    label="开始路单时间"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="timeReal"
+                    label="结束路单时间"
+                    width="200">
+            </el-table-column>
+            <el-table-column
+                    prop="status"
+                    label="状态"
+                    width="150"
+                    :formatter="formatStatus">
+            </el-table-column>
+            <el-table-column
+                    prop="remark"
+                    label="备注"
+                    show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+                    label="操作" width="200">
+                <template scope="scope">
+                    <el-button type="text" @click="deletecombineInRow(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+
+        </el-table>
+        <br/>
+
+        <el-row>
+
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5,10, 30, 40, 50]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </el-row>
+        <br/>
+    </div>
+    <!-- 新增，修改用户结束-->
+    <div class="panel panel-default" v-show="!showList">
+        <div class="panel-heading">{{title}}</div>
+        <div class="panel-body">
+            <el-form :model="combineForm" ref="combineForm" label-width="140px">
+
+                <el-form-item label="计划路单用户名" prop="usernamePlan">
+
+                    <el-input v-model="combineForm.usernamePlan" placeholder="请输入用户名称" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                </el-form-item>
+                <el-form-item label="用车类型" prop="carId">
+                    <el-radio-group v-model="combineForm.carId">
+                        <el-radio label="1">甲醇罐车</el-radio>
+                        <el-radio label="2">货车</el-radio>
+                        <el-radio label="3">地层水罐车</el-radio>
+                        <el-radio label="4">吊车</el-radio>
+                        <el-radio label="5">炮车</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="车辆数目" prop="carNumber">
+                    <el-input v-model="combineForm.carNumber" placeholder="请输入车辆数目" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="出发地" prop="originId">
+                    <el-select v-model="combineForm.originId" placeholder="请选择出发地">
+                        <el-option
+                                v-for="car in caroptions"
+                                :key="car.value"
+                                :label="car.label"
+                                :value="car.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="目的地" prop="destinationId">
+                    <el-select v-model="combineForm.destinationId" placeholder="请选择目的地">
+                        <el-option
+                                v-for="car in caroptions"
+                                :key="car.value"
+                                :label="car.label"
+                                :value="car.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="拉运量" prop="transportPlan">
+                    <el-input v-model="combineForm.transportPlan" placeholder="请输入拉运量" class="middleInput"
+                              maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="出发时间" prop="timePlan">
+                    <el-date-picker
+                            v-model="combineForm.timePlan"
+                            type="date"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="到达时间" prop="timeReal">
+                    <el-date-picker
+                            v-model="combineForm.timeReal"
+                            type="date"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="cancel">取消</el-button>
+                    <el-button type="primary" @click="savecombine">保存</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+
+    </div>
+
+
+</div>
+
+<script src="${request.contextPath}/statics/js/modules/basic/combinedlist.js?_${.now?long}"></script>
+</body>
+</html>

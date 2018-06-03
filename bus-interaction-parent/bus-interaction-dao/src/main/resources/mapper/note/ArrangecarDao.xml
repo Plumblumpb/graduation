@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.module.note.dao.ArrangecarDao">
+
+    <select id="getAll" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select noteid , username_plan ,car.type , car_number,origin_id,destination_id ,transport_plan,status
+        ,n.company_id,time_plan,time_real,remark from note_car n
+        left JOIN car on car.carid = n.car_id
+        where status in (40,41)
+    </select>
+
+    <update id="insertCompany">
+
+        update note_car SET company_id = #{companyId,jdbcType=INTEGER} , status = '50'
+        <if test="remark != null">
+            ,remark = #{remark}
+        </if>
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateStatus">
+
+        update note_car SET status = '50'
+        <if test="remark != null">
+            ,remark = #{remark}
+        </if>
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </update>
+
+    <update id="returnStatus">
+
+        update note_car SET status = '31'
+        <if test="remark != null">
+            ,remark = #{remark}
+        </if>
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectOne" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select
+        <include refid="Base_Column_List"/>
+        from note_car
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectBySelective" resultType="com.ssm.module.note.tool.NoteCarTools">
+        select noteid , username_plan ,car.type , car_number,origin_id,destination_id ,transport_plan,status
+        ,n.company_id,time_plan,time_real,remark from note_car n
+        left JOIN car on car.carid = n.car_id
+        where
+
+        <if test="usernamePlan != null and usernamePlan != ''">
+            n.username_plan like '%${usernamePlan}%' and
+        </if>
+        <if test="originId != null and originId != ''">
+            n.origin_id = #{originId} and
+        </if>
+        <if test="destinationId != null and destinationId != ''">
+            n.destination_id = #{destinationId} and
+        </if>
+
+        n.status in (40,41)
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from note_car
+        where noteid = #{noteid,jdbcType=INTEGER}
+    </delete>
+
+    <sql id="Base_Column_List">
+        noteid, username_plan, car_id, car_number, origin_id, destination_id, status, transport_plan,
+        transport_real, beginTime, time_plan, time_real, username_real,company_id,remark
+    </sql>
+
+
+</mapper>
